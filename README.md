@@ -7,6 +7,8 @@
 Engines sit behind one contract. Each domain that asks them questions is its own package.
 The lab exists to compare engines on the same evidence — not to promote one.
 
+[![check](https://github.com/elixirautomation/system-one-decision-lab/actions/workflows/check.yml/badge.svg)](https://github.com/elixirautomation/system-one-decision-lab/actions/workflows/check.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
 `TypeSafe Jev` · hosted &nbsp;•&nbsp; `Laya` · self-hosted, Apache-2.0 &nbsp;•&nbsp; `PostgreSQL` &nbsp;•&nbsp; `Drizzle` &nbsp;•&nbsp; `Playwright`
 
 </div>
