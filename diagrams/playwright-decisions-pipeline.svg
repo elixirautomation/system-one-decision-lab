@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 380" width="1180" height="380" role="img"
+     aria-labelledby="pipelineTitle pipelineDesc">
+  <title id="pipelineTitle">The decision pipeline</title>
+  <desc id="pipelineDesc">A Playwright run is captured, failures are triaged by the selected System One
+  engine over POST /v1/systemone, the answer is routed through a confidence gate, everything is persisted in
+  PostgreSQL, and the decision report is rebuilt. Passing tests skip the engine entirely.</desc>
+
+  <style>
+    /* Design tokens mirror src/report/report-assets.ts so this diagram reads as
+       part of the product rather than as a separate illustration. */
+    svg {
+      --bg: #f4f6fb; --surface: #fff; --surface-2: #f8f9fc;
+      --ink: #172033; --muted: #68748a; --line: #e2e6ef;
+      --accent: #5a4df0; --accent-2: #2f80ed; --success: #17a673;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --bg: #111522; --surface: #181e2e; --surface-2: #202739;
+        --ink: #edf1fb; --muted: #a6afc1; --line: #30394d;
+        --accent: #8b81f5; --accent-2: #5aa2f5; --success: #35c894;
+      }
+    }
+
+    .canvas { fill: var(--bg); }
+    .card { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+    .card-alt { fill: var(--surface-2); stroke: var(--line); stroke-width: 1.25; }
+    .title { fill: var(--ink); font-size: 13px; font-weight: 600; }
+    .sub { fill: var(--muted); font-size: 10.5px; }
+    .cap { fill: var(--muted); font-size: 11px; }
+    .step { fill: var(--accent); }
+    .step-num { fill: #fff; font-size: 10px; font-weight: 700; }
+    .wire { fill: none; stroke: var(--line); stroke-width: 1.5; }
+    .flow { fill: none; stroke: var(--accent); stroke-width: 1.75; stroke-linecap: round;
+            stroke-dasharray: 5 9; }
+    .bypass { fill: none; stroke: var(--success); stroke-width: 1.5; stroke-dasharray: 4 7; opacity: .85; }
+    .bypass-cap { fill: var(--success); font-size: 10.5px; }
+    .arrow { fill: var(--accent); }
+    .arrow-ok { fill: var(--success); }
+    .glow { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; }
+
+    /* Shared keyframe vocabulary with the report: a staggered rise-in entrance,
+       then a repeating highlight that walks the eye through the stages in order. */
+    @keyframes rise-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes dash-flow { to { stroke-dashoffset: -28; } }
+    @keyframes walk { 0%, 8% { opacity: 0; } 2% { opacity: .85; } 16%, 100% { opacity: 0; } }
+    @keyframes breathe { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+
+    .stage { animation: rise-in .55s cubic-bezier(.22, .68, .24, 1) both; }
+    .s1 { animation-delay: .05s; } .s2 { animation-delay: .17s; } .s3 { animation-delay: .29s; }
+    .s4 { animation-delay: .41s; } .s5 { animation-delay: .53s; } .s6 { animation-delay: .65s; }
+    .engine { animation: rise-in .55s cubic-bezier(.22, .68, .24, 1) .78s both; }
+    .trailing { animation: rise-in .5s ease .9s both; }
+
+    .flow { animation: dash-flow 1.1s linear infinite; }
+    .bypass { animation: dash-flow 2.4s linear infinite reverse; }
+    .pulse { animation: breathe 2.6s ease-in-out infinite; }
+
+    .glow { animation: walk 6s linear infinite; }
+    .g1 { animation-delay: 1.0s; } .g2 { animation-delay: 2.0s; } .g3 { animation-delay: 3.0s; }
+    .g4 { animation-delay: 4.0s; } .g5 { animation-delay: 5.0s; } .g6 { animation-delay: 6.0s; }
+
+    /* Motion is decoration here: every label and connector is already in its final
+       position, so removing animation loses nothing but the guided reading order. */
+    @media (prefers-reduced-motion: reduce) {
+      .stage, .engine, .trailing, .flow, .bypass, .pulse, .glow {
+        animation: none;
+      }
+      .stage, .engine, .trailing { opacity: 1; transform: none; }
+      .glow { opacity: 0; }
+    }
+  </style>
+
+  <rect class="canvas" width="1180" height="380" rx="18"/>
+
+  <!-- ─────────── the engine, above the stage it serves ─────────── -->
+  <g class="engine">
+    <rect class="card-alt" x="356" y="34" width="270" height="58" rx="13"/>
+    <text class="title" x="491" y="58" text-anchor="middle">System One engine</text>
+    <text class="sub" x="491" y="76" text-anchor="middle">POST /v1/systemone — 1 Choice + 2 Noul</text>
+  </g>
+  <g class="engine">
+    <path class="flow pulse" d="M491 96 V150"/>
+    <path class="arrow" d="M491 156 l-5 -8 h10 z"/>
+    <path class="arrow" d="M491 92 l-5 8 h10 z" transform="translate(0,-2)"/>
+  </g>
+
+  <!-- ─────────── main lane ─────────── -->
+  <g class="stage s1">
+    <rect class="card" x="24" y="156" width="150" height="78" rx="14"/>
+    <circle class="step" cx="46" cy="178" r="11"/><text class="step-num" x="46" y="182" text-anchor="middle">1</text>
+    <text class="title" x="99" y="205" text-anchor="middle">Playwright run</text>
+    <text class="sub" x="99" y="222" text-anchor="middle">yarn e2e</text>
+  </g>
+  <g class="stage s2">
+    <rect class="card" x="220" y="156" width="150" height="78" rx="14"/>
+    <circle class="step" cx="242" cy="178" r="11"/><text class="step-num" x="242" y="182" text-anchor="middle">2</text>
+    <text class="title" x="295" y="205" text-anchor="middle">Capture</text>
+    <text class="sub" x="295" y="222" text-anchor="middle">normalise evidence</text>
+  </g>
+  <g class="stage s3">
+    <rect class="card" x="416" y="156" width="150" height="78" rx="14"/>
+    <circle class="step" cx="438" cy="178" r="11"/><text class="step-num" x="438" y="182" text-anchor="middle">3</text>
+    <text class="title" x="491" y="205" text-anchor="middle">Triage</text>
+    <text class="sub" x="491" y="222" text-anchor="middle">failures only</text>
+  </g>
+  <g class="stage s4">
+    <rect class="card" x="612" y="156" width="150" height="78" rx="14"/>
+    <circle class="step" cx="634" cy="178" r="11"/><text class="step-num" x="634" y="182" text-anchor="middle">4</text>
+    <text class="title" x="687" y="205" text-anchor="middle">Confidence gate</text>
+    <text class="sub" x="687" y="222" text-anchor="middle">act / review / escalate</text>
+  </g>
+  <g class="stage s5">
+    <rect class="card" x="808" y="156" width="150" height="78" rx="14"/>
+    <circle class="step" cx="830" cy="178" r="11"/><text class="step-num" x="830" y="182" text-anchor="middle">5</text>
+    <text class="title" x="883" y="205" text-anchor="middle">PostgreSQL</text>
+    <text class="sub" x="883" y="222" text-anchor="middle">runs, tests, decisions</text>
+  </g>
+  <g class="stage s6">
+    <rect class="card" x="1004" y="156" width="150" height="78" rx="14"/>
+    <circle class="step" cx="1026" cy="178" r="11"/><text class="step-num" x="1026" y="182" text-anchor="middle">6</text>
+    <text class="title" x="1079" y="205" text-anchor="middle">Decision report</text>
+    <text class="sub" x="1079" y="222" text-anchor="middle">one index.html</text>
+  </g>
+
+  <!-- ─────────── connectors ─────────── -->
+  <g class="trailing">
+    <path class="flow" d="M176 195 H212"/><path class="arrow" d="M220 195 l-8 -5 v10 z"/>
+    <path class="flow" d="M372 195 H408"/><path class="arrow" d="M416 195 l-8 -5 v10 z"/>
+    <path class="flow" d="M568 195 H604"/><path class="arrow" d="M612 195 l-8 -5 v10 z"/>
+    <path class="flow" d="M764 195 H800"/><path class="arrow" d="M808 195 l-8 -5 v10 z"/>
+    <path class="flow" d="M960 195 H996"/><path class="arrow" d="M1004 195 l-8 -5 v10 z"/>
+  </g>
+
+  <!-- ─────────── the pass path, which never reaches an engine ─────────── -->
+  <g class="trailing">
+    <path class="bypass" d="M295 236 V282 Q295 300 313 300 H865 Q883 300 883 282 V244"/>
+    <path class="arrow-ok" d="M883 236 l-5 8 h10 z"/>
+    <text class="bypass-cap" x="589" y="322" text-anchor="middle">passing tests skip the engine entirely — no key, no egress, no cost</text>
+  </g>
+
+  <!-- ─────────── guided highlight, one stage at a time ─────────── -->
+  <rect class="glow g1" x="24" y="156" width="150" height="78" rx="14"/>
+  <rect class="glow g2" x="220" y="156" width="150" height="78" rx="14"/>
+  <rect class="glow g3" x="416" y="156" width="150" height="78" rx="14"/>
+  <rect class="glow g4" x="612" y="156" width="150" height="78" rx="14"/>
+  <rect class="glow g5" x="808" y="156" width="150" height="78" rx="14"/>
+  <rect class="glow g6" x="1004" y="156" width="150" height="78" rx="14"/>
+
+  <text class="cap trailing" x="590" y="356" text-anchor="middle">
+    The report is rebuilt as the last step of every run — including a failing one.
+  </text>
+</svg>

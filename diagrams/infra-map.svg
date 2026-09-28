@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 400" width="1060" height="400" role="img"
+     aria-labelledby="infraTitle infraDesc">
+  <title id="infraTitle">What infra is, and which way it points</title>
+  <desc id="infraDesc">Reusable platform packages. decision-core owns provider contracts, generic registry mechanics,
+  confidence gating and transport. Provider workspaces implement the contracts. config owns repository environment
+  loading. decision-store owns only persistence and receives resolved configuration explicitly. The orchestrator is
+  a generic Docker lifecycle runner. Every dependency arrow points toward reusable contracts; none points to a use case.</desc>
+
+  <style>
+    /* Tokens mirror src/report/report-assets.ts. Duplicated per file on purpose:
+       an SVG embedded with &lt;img&gt; cannot load an external stylesheet. */
+    svg {
+      --bg: #f4f6fb; --surface: #fff; --surface-2: #f8f9fc;
+      --ink: #172033; --muted: #68748a; --line: #e2e6ef;
+      --accent: #5a4df0; --accent-2: #2f80ed; --success: #17a673; --danger: #ef5b5b;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --bg: #111522; --surface: #181e2e; --surface-2: #202739;
+        --ink: #edf1fb; --muted: #a6afc1; --line: #30394d;
+        --accent: #8b81f5; --accent-2: #5aa2f5; --success: #35c894; --danger: #f47c7c;
+      }
+    }
+
+    .canvas { fill: var(--bg); }
+    .card { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+    .card-alt { fill: var(--surface-2); stroke: var(--line); stroke-width: 1.25; }
+    .group { fill: none; stroke: var(--line); stroke-width: 1.25; stroke-dasharray: 3 4; }
+    .title { fill: var(--ink); font-size: 13px; font-weight: 600; }
+    .sub { fill: var(--muted); font-size: 10.5px; }
+    .cap { fill: var(--muted); font-size: 11px; }
+    .accent-text { fill: var(--accent); font-size: 10.5px; font-weight: 600; }
+    .deny { fill: var(--danger); font-size: 10.5px; font-weight: 600; }
+    .wire { fill: none; stroke: var(--line); stroke-width: 1.5; }
+    .dep { fill: none; stroke: var(--accent); stroke-width: 1.75; stroke-linecap: round; stroke-dasharray: 5 9; }
+    .blocked { fill: none; stroke: var(--danger); stroke-width: 1.5; stroke-dasharray: 3 5; opacity: .9; }
+    .arrow { fill: var(--accent); }
+    .chip { fill: var(--surface-2); stroke: var(--line); stroke-width: 1; }
+    .glow { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; }
+    .no { stroke: var(--danger); stroke-width: 2; stroke-linecap: round; }
+
+    @keyframes rise-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes dash-flow { to { stroke-dashoffset: -28; } }
+    @keyframes walk { 0%, 10% { opacity: 0; } 3% { opacity: .85; } 20%, 100% { opacity: 0; } }
+    /* The forbidden direction is drawn, then struck through, so the rule is shown
+       rather than only stated. */
+    @keyframes strike { 0%, 30% { opacity: 0; } 42%, 100% { opacity: 1; } }
+
+    .stage { animation: rise-in .55s cubic-bezier(.22, .68, .24, 1) both; }
+    .s1 { animation-delay: .05s; } .s2 { animation-delay: .18s; } .s3 { animation-delay: .31s; }
+    .s4 { animation-delay: .44s; } .s5 { animation-delay: .57s; }
+    .dep { animation: dash-flow 1.2s linear infinite; }
+    .blocked { animation: dash-flow 2.6s linear infinite reverse; }
+    .struck { animation: strike 5s ease-in-out infinite; }
+    .glow { animation: walk 5.5s linear infinite; }
+    .g1 { animation-delay: .8s; } .g2 { animation-delay: 2.0s; } .g3 { animation-delay: 3.2s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .stage, .dep, .blocked, .struck, .glow { animation: none; }
+      .stage { opacity: 1; transform: none; }
+      .struck { opacity: 1; }
+      .glow { opacity: 0; }
+    }
+  </style>
+
+  <rect class="canvas" width="1060" height="400" rx="18"/>
+
+  <!-- use cases, the dependants -->
+  <g class="stage s1">
+    <rect class="group" x="28" y="44" width="212" height="150" rx="12"/>
+    <text class="accent-text" x="42" y="66">packages/usecases/*</text>
+    <rect class="card" x="42" y="78" width="184" height="42" rx="10"/>
+    <text class="title" x="58" y="96">playwright-decisions</text>
+    <text class="sub" x="58" y="111">its own evidence tables</text>
+    <rect class="card-alt" x="42" y="130" width="184" height="42" rx="10"/>
+    <text class="sub" x="58" y="148">your next use case</text>
+    <text class="sub" x="58" y="163">its own tables too</text>
+  </g>
+
+  <!-- depends-on arrows, pointing only right -->
+  <path class="wire" d="M240 99 H300"/>
+  <path class="dep" d="M240 99 H300"/>
+  <polygon class="arrow" points="300,99 293,95 293,103"/>
+  <path class="wire" d="M240 151 H300"/>
+  <path class="dep" d="M240 151 H300"/>
+  <polygon class="arrow" points="300,151 293,147 293,155"/>
+  <text class="cap" x="243" y="132">depends on</text>
+
+  <!-- decision-store -->
+  <g class="stage s2">
+    <rect class="card" x="308" y="62" width="234" height="126" rx="12"/>
+    <text class="title" x="326" y="88">@sysone/decision-store</text>
+    <text class="sub" x="326" y="105">the shared decisions table</text>
+    <rect class="chip" x="326" y="115" width="96" height="21" rx="6"/>
+    <text class="sub" x="335" y="130">recordDecision</text>
+    <rect class="chip" x="428" y="115" width="96" height="21" rx="6"/>
+    <text class="sub" x="437" y="130">explicit DB URL</text>
+    <rect class="chip" x="326" y="142" width="198" height="21" rx="6"/>
+    <text class="sub" x="335" y="157">runMigrations · one journal per package</text>
+    <text class="cap" x="326" y="178">drizzle · pg</text>
+  </g>
+
+  <path class="wire" d="M542 125 H602"/>
+  <path class="dep" d="M542 125 H602"/>
+  <polygon class="arrow" points="602,125 595,121 595,129"/>
+
+  <!-- decision-core -->
+  <g class="stage s3">
+    <rect class="card" x="610" y="48" width="240" height="154" rx="12"/>
+    <text class="title" x="628" y="74">@sysone/decision-core</text>
+    <text class="sub" x="628" y="91">contracts, registry, gate, transport</text>
+    <rect class="chip" x="628" y="101" width="90" height="21" rx="6"/>
+    <text class="sub" x="637" y="116">contract.ts</text>
+    <rect class="chip" x="724" y="101" width="90" height="21" rx="6"/>
+    <text class="sub" x="733" y="116">registry.ts</text>
+    <rect class="chip" x="628" y="128" width="90" height="21" rx="6"/>
+    <text class="sub" x="637" y="143">transport</text>
+    <rect class="chip" x="724" y="128" width="90" height="21" rx="6"/>
+    <text class="sub" x="733" y="143">gate.ts</text>
+    <text class="accent-text" x="628" y="172">no database · no filesystem</text>
+    <text class="cap" x="628" y="190">depends on nothing · engines plug in here</text>
+  </g>
+
+  <!-- orchestrator, beside rather than in the chain -->
+  <g class="stage s4">
+    <rect class="card" x="308" y="222" width="234" height="96" rx="12"/>
+    <text class="title" x="326" y="248">@sysone/orchestrator</text>
+    <text class="sub" x="326" y="265">Docker only: PostgreSQL, engines</text>
+    <rect class="chip" x="326" y="275" width="70" height="21" rx="6"/>
+    <text class="sub" x="335" y="290">./start</text>
+    <rect class="chip" x="402" y="275" width="122" height="21" rx="6"/>
+    <text class="sub" x="411" y="290">stop · clean · status</text>
+    <text class="cap" x="326" y="310">no application commands</text>
+  </g>
+  <path class="wire" d="M425 222 V194" stroke-dasharray="4 6"/>
+  <text class="cap" x="436" y="212">runs what core needs</text>
+
+  <!-- the forbidden direction: from infra back towards a use case, struck out -->
+  <g class="stage s5">
+    <path class="blocked" d="M700 210 V352 H196"/>
+    <polygon points="196,352 203,348 203,356" fill="var(--danger)"/>
+    <g class="struck">
+      <line class="no" x1="418" y1="336" x2="466" y2="368"/>
+      <line class="no" x1="466" y1="336" x2="418" y2="368"/>
+    </g>
+    <text class="deny" x="482" y="344">infra may never depend on a use case</text>
+    <text class="cap" x="482" y="362">no import, no table, no type — which is why a decision names its subject polymorphically</text>
+  </g>
+
+  <g>
+    <rect class="glow g1" x="308" y="62" width="234" height="126" rx="12"/>
+    <rect class="glow g2" x="610" y="48" width="240" height="154" rx="12"/>
+    <rect class="glow g3" x="308" y="222" width="234" height="96" rx="12"/>
+  </g>
+
+  <text class="cap" x="872" y="74">Read the package README</text>
+  <text class="sub" x="872" y="94">decision-core → the API</text>
+  <text class="sub" x="872" y="112">decision-store → storage</text>
+  <text class="sub" x="872" y="130">orchestrator → lifecycle</text>
+</svg>

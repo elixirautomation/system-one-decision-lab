@@ -1,0 +1,43 @@
+{
+  "name": "@sysone/playwright-decisions",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Use case: System One decisions over live Playwright failures and run history",
+  "license": "Apache-2.0",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test \"src/**/*.test.ts\"",
+    "check": "yarn typecheck && yarn test",
+    "setup": "yarn db:migrate && playwright install chromium",
+    "clean": "node -e \"const fs=require('node:fs'); for(const p of ['playwright/.auth','test-results','triage-output','report-output']) fs.rmSync(p,{recursive:true,force:true})\"",
+    "e2e": "playwright test",
+    "e2e:headed": "playwright test --headed",
+    "e2e:ui": "playwright test --ui",
+    "seed": "tsx src/data/seed.ts",
+    "report": "tsx src/report/build-report.ts",
+    "experiment": "tsx src/experiments/exp1-noul-flakiness.ts",
+    "experiment:noul": "tsx src/experiments/exp1-noul-flakiness.ts",
+    "experiment:choice": "tsx src/experiments/exp2-choice-root-cause.ts",
+    "experiment:score": "tsx src/experiments/exp3-score-evidence-strength.ts",
+    "experiment:all": "yarn experiment:noul && yarn experiment:choice && yarn experiment:score",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/db/migrate.ts"
+  },
+  "dependencies": {
+    "@sysone/config": "workspace:^",
+    "@sysone/decision-core": "workspace:^",
+    "@sysone/decision-store": "workspace:^",
+    "@sysone/provider-jev": "workspace:^",
+    "@sysone/provider-laya": "workspace:^",
+    "drizzle-orm": "0.45.3",
+    "pg": "8.13.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/pg": "8.11.10",
+    "drizzle-kit": "0.31.11",
+    "tsx": "4.23.15",
+    "typescript": "5.7.2"
+  }
+}

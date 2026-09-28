@@ -1,0 +1,57 @@
+name: system-one-decision-lab
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: decisionlab
+      POSTGRES_PASSWORD: decisionlab
+      POSTGRES_DB: decision_lab
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U decisionlab -d decision_lab"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+      start_period: 3s
+
+  laya:
+    profiles: ["laya"]
+    build:
+      context: ./packages/providers/laya
+      dockerfile: Dockerfile
+      args:
+        TORCH_INDEX: ${LAYA_TORCH_INDEX:-cpu}
+    init: true
+    environment:
+      LAYA_HOST: 0.0.0.0
+      LAYA_PORT: "8000"
+      LAYA_DEVICE: ${LAYA_DEVICE:-cpu}
+      LAYA_PRELOAD: ${LAYA_PRELOAD:-1}
+      LAYA_MODELS: ${LAYA_MODELS:-english}
+      LAYA_THREADS: ${LAYA_THREADS:-4}
+      LAYA_AUTO_TASK: ${LAYA_AUTO_TASK:-0}
+      LAYA_API_KEY: ${LAYA_API_KEY:-}
+      LAYA_LOG_LEVEL: ${LAYA_LOG_LEVEL:-info}
+      HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-0}
+    ports:
+      - "${LAYA_HOST_PORT:-8000}:8000"
+    volumes:
+      - laya-model-cache:/home/laya/.cache/huggingface
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=5).status==200 else 1)\""]
+      interval: 5s
+      timeout: 10s
+      retries: 60
+      start_period: 900s
+
+x-sysone-retention:
+  clean: [postgres-data]
+  model-cache: [laya-model-cache]
+
+volumes:
+  postgres-data:
+  laya-model-cache:

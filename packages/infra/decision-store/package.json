@@ -1,0 +1,30 @@
+{
+  "name": "@sysone/decision-store",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The shared, use-case-agnostic decisions table, its write API, and the migration runner",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test \"src/**/*.test.ts\"",
+    "check": "yarn typecheck && yarn test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/bin/migrate.ts"
+  },
+  "dependencies": {
+    "@sysone/config": "workspace:^",
+    "@sysone/decision-core": "workspace:^",
+    "drizzle-orm": "0.45.3",
+    "pg": "8.13.1"
+  },
+  "devDependencies": {
+    "@types/pg": "8.11.10",
+    "drizzle-kit": "0.31.11",
+    "tsx": "4.23.15",
+    "typescript": "5.7.2"
+  }
+}

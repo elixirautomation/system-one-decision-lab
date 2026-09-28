@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 380" width="1060" height="380" role="img"
+     aria-labelledby="storeTitle storeDesc">
+  <title id="storeTitle">One decision row, and why it has no foreign key</title>
+  <desc id="storeDesc">A use case describes its subject once — a namespaced type, an opaque id, a label and the
+  identity keys it aggregates by — and the engine's answer supplies the rest of the row. The reference is
+  polymorphic rather than a foreign key, so decision-store never has to know what a test case is, and a second
+  use case can store decisions about anything without inheriting another use case's tables. Each package keeps
+  its own migration journal, because two packages sharing one journal would each treat the other's first
+  migration as already applied.</desc>
+
+  <style>
+    /* Tokens mirror src/report/report-assets.ts. Duplicated per file on purpose:
+       an SVG embedded with &lt;img&gt; cannot load an external stylesheet. */
+    svg {
+      --bg: #f4f6fb; --surface: #fff; --surface-2: #f8f9fc;
+      --ink: #172033; --muted: #68748a; --line: #e2e6ef;
+      --accent: #5a4df0; --accent-2: #2f80ed; --success: #17a673; --danger: #ef5b5b;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --bg: #111522; --surface: #181e2e; --surface-2: #202739;
+        --ink: #edf1fb; --muted: #a6afc1; --line: #30394d;
+        --accent: #8b81f5; --accent-2: #5aa2f5; --success: #35c894; --danger: #f47c7c;
+      }
+    }
+
+    .canvas { fill: var(--bg); }
+    .card { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+    .card-alt { fill: var(--surface-2); stroke: var(--line); stroke-width: 1.25; }
+    .row { fill: var(--surface); stroke: var(--accent); stroke-width: 1.4; }
+    .title { fill: var(--ink); font-size: 12.5px; font-weight: 600; }
+    .sub { fill: var(--muted); font-size: 10px; }
+    .cap { fill: var(--muted); font-size: 10.5px; }
+    .mono { fill: var(--ink); font-size: 10.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .accent-text { fill: var(--accent); font-size: 10.5px; font-weight: 600; }
+    .ok-text { fill: var(--success); font-size: 10px; font-weight: 600; }
+    .deny { fill: var(--danger); font-size: 10.5px; font-weight: 600; }
+    .wire { fill: none; stroke: var(--line); stroke-width: 1.5; }
+    .flow { fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 5 9; }
+    .arrow { fill: var(--accent); }
+    .chip { fill: var(--surface-2); stroke: var(--line); stroke-width: 1; }
+    .field { fill: var(--surface-2); stroke: var(--line); stroke-width: 1; }
+    .no { stroke: var(--danger); stroke-width: 2; stroke-linecap: round; }
+    .glow { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; }
+
+    @keyframes rise-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes dash-flow { to { stroke-dashoffset: -28; } }
+    @keyframes walk { 0%, 12% { opacity: 0; } 4% { opacity: .9; } 24%, 100% { opacity: 0; } }
+    /* Fields land in the row one after another, which is the shape of the write. */
+    @keyframes land { 0%, 6% { opacity: 0; transform: translateX(-10px); } 16%, 100% { opacity: 1; transform: translateX(0); } }
+
+    .stage { animation: rise-in .5s cubic-bezier(.22, .68, .24, 1) both; }
+    .s1 { animation-delay: .05s; } .s2 { animation-delay: .18s; } .s3 { animation-delay: .31s; } .s4 { animation-delay: .44s; }
+    .flow { animation: dash-flow 1.2s linear infinite; }
+    .cell { animation: land 6s ease-out infinite; }
+    .c1 { animation-delay: .2s; } .c2 { animation-delay: .5s; } .c3 { animation-delay: .8s; }
+    .c4 { animation-delay: 1.1s; } .c5 { animation-delay: 1.4s; } .c6 { animation-delay: 1.7s; }
+    .glow { animation: walk 6s linear infinite; }
+    .g1 { animation-delay: .6s; } .g2 { animation-delay: 2.4s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .stage, .flow, .cell, .glow { animation: none; }
+      .stage, .cell { opacity: 1; transform: none; }
+      .glow { opacity: 0; }
+    }
+  </style>
+
+  <rect class="canvas" width="1060" height="380" rx="18"/>
+
+  <!-- the subject, described by the use case -->
+  <g class="stage s1">
+    <text class="accent-text" x="36" y="42">the use case describes its subject, once</text>
+    <rect class="card" x="36" y="56" width="268" height="140" rx="11"/>
+    <rect class="field" x="52" y="72" width="236" height="24" rx="6"/>
+    <text class="mono" x="62" y="88">type: 'playwright:test_case'</text>
+    <rect class="field" x="52" y="102" width="236" height="24" rx="6"/>
+    <text class="mono" x="62" y="118">id: &lt;your table's row id&gt;</text>
+    <rect class="field" x="52" y="132" width="236" height="24" rx="6"/>
+    <text class="mono" x="62" y="148">label: 'suite &gt; test'</text>
+    <rect class="field" x="52" y="162" width="236" height="24" rx="6"/>
+    <text class="mono" x="62" y="178">keys: { project, suite, test }</text>
+  </g>
+
+  <!-- the engine's answer -->
+  <g class="stage s2">
+    <text class="accent-text" x="36" y="228">the engine supplies the rest</text>
+    <rect class="card-alt" x="36" y="242" width="268" height="96" rx="11"/>
+    <rect class="chip" x="52" y="256" width="78" height="21" rx="6"/>
+    <text class="sub" x="60" y="271">provider</text>
+    <rect class="chip" x="136" y="256" width="66" height="21" rx="6"/>
+    <text class="sub" x="144" y="271">model</text>
+    <rect class="chip" x="208" y="256" width="80" height="21" rx="6"/>
+    <text class="sub" x="216" y="271">category</text>
+    <rect class="chip" x="52" y="283" width="90" height="21" rx="6"/>
+    <text class="sub" x="60" y="298">confidence</text>
+    <rect class="chip" x="148" y="283" width="140" height="21" rx="6"/>
+    <text class="sub" x="156" y="298">routing signal + value</text>
+    <text class="cap" x="52" y="324">result holds the answer verbatim</text>
+  </g>
+
+  <path class="wire" d="M304 126 H372 V184"/>
+  <path class="flow" d="M304 126 H372 V184"/>
+  <path class="wire" d="M304 290 H372 V216"/>
+  <path class="flow" d="M304 290 H372 V216"/>
+  <path class="wire" d="M372 200 H420"/>
+  <polygon class="arrow" points="420,200 413,196 413,204"/>
+  <text class="cap" x="316" y="196">recordDecision</text>
+
+  <!-- the single row -->
+  <g class="stage s3">
+    <rect class="row" x="428" y="96" width="330" height="208" rx="12"/>
+    <text class="title" x="448" y="122">decisions · one shared table</text>
+    <g class="cell c1"><rect class="field" x="448" y="134" width="290" height="22" rx="6"/>
+      <text class="mono" x="458" y="149">subject_type   subject_id</text></g>
+    <g class="cell c2"><rect class="field" x="448" y="162" width="290" height="22" rx="6"/>
+      <text class="mono" x="458" y="177">subject_label  subject_keys</text></g>
+    <g class="cell c3"><rect class="field" x="448" y="190" width="290" height="22" rx="6"/>
+      <text class="mono" x="458" y="205">provider       model</text></g>
+    <g class="cell c4"><rect class="field" x="448" y="218" width="290" height="22" rx="6"/>
+      <text class="mono" x="458" y="233">category  score  noul  confidence</text></g>
+    <g class="cell c5"><rect class="field" x="448" y="246" width="290" height="22" rx="6"/>
+      <text class="mono" x="458" y="261">routing_signal routing_value</text></g>
+    <g class="cell c6"><rect class="field" x="448" y="274" width="290" height="22" rx="6"/>
+      <text class="mono" x="458" y="289">result  input_tokens  output_tokens</text></g>
+  </g>
+
+  <!-- the absent foreign key, shown as absent -->
+  <g class="stage s4">
+    <path class="wire" d="M758 200 H822" stroke-dasharray="3 5" stroke="var(--danger)"/>
+    <polygon points="822,200 815,196 815,204" fill="var(--danger)"/>
+    <line class="no" x1="772" y1="186" x2="806" y2="214"/>
+    <line class="no" x1="806" y1="186" x2="772" y2="214"/>
+    <rect class="card" x="830" y="150" width="196" height="100" rx="11"/>
+    <text class="deny" x="846" y="174">no foreign key</text>
+    <text class="sub" x="846" y="192">infra would then depend on</text>
+    <text class="sub" x="846" y="207">a use case's tables</text>
+    <text class="cap" x="846" y="228">the cost: no cascade, no</text>
+    <text class="cap" x="846" y="242">database-enforced reference</text>
+  </g>
+
+  <!-- journals -->
+  <g class="stage s4">
+    <text class="accent-text" x="428" y="330">one migration journal per package — sharing one makes the second never run</text>
+    <rect class="card-alt" x="428" y="340" width="278" height="26" rx="7"/>
+    <text class="sub" x="440" y="357">__drizzle_migrations_decision_store</text>
+    <rect class="card-alt" x="716" y="340" width="258" height="26" rx="7"/>
+    <text class="sub" x="728" y="357">__drizzle_migrations_&lt;use case&gt;</text>
+  </g>
+
+  <g>
+    <rect class="glow g1" x="36" y="56" width="268" height="140" rx="11"/>
+    <rect class="glow g2" x="428" y="96" width="330" height="208" rx="12"/>
+  </g>
+</svg>

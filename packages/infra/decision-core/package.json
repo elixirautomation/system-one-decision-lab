@@ -1,0 +1,20 @@
+{
+  "name": "@sysone/decision-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The System One provider contract, registry, resolution, confidence gate, and transport",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test \"src/**/*.test.ts\"",
+    "check": "yarn typecheck && yarn test"
+  },
+  "devDependencies": {
+    "tsx": "4.23.15",
+    "typescript": "5.7.2"
+  }
+}

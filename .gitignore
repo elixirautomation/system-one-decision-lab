@@ -1,0 +1,21 @@
+node_modules/
+dist/
+
+# One .env at the repository root, loaded from anywhere by loadLabEnv().
+.env
+
+# Produced by a use case, inside that use case's package.
+**/playwright/.auth/
+**/test-results/
+**/playwright-report/
+**/triage-output/
+**/report-output/
+
+*.log
+.DS_Store
+
+# Yarn Berry: the pinned release is committed, the rest is machine-local.
+.yarn/*
+!.yarn/releases
+.yarn/cache
+.yarn/install-state.gz

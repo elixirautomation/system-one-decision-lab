@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 340" width="1060" height="340" role="img"
+     aria-labelledby="lifeTitle lifeDesc">
+  <title id="lifeTitle">What each lifecycle command keeps, and what it removes</title>
+  <desc id="lifeDesc">Start brings PostgreSQL up, waits for its health probe, discovers every locally served
+  engine from the root Compose composition, and health-checks each one. Stop preserves all volumes. Clean removes
+  only clean-labelled infrastructure data and deliberately keeps model caches. Purge-models removes only
+  model-cache-labelled volumes. Application migrations and artifacts remain outside this lifecycle.</desc>
+
+  <style>
+    /* Tokens mirror src/report/report-assets.ts. Duplicated per file on purpose:
+       an SVG embedded with &lt;img&gt; cannot load an external stylesheet. */
+    svg {
+      --bg: #f4f6fb; --surface: #fff; --surface-2: #f8f9fc;
+      --ink: #172033; --muted: #68748a; --line: #e2e6ef;
+      --accent: #5a4df0; --accent-2: #2f80ed; --success: #17a673; --warn: #e2a93b; --danger: #ef5b5b;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --bg: #111522; --surface: #181e2e; --surface-2: #202739;
+        --ink: #edf1fb; --muted: #a6afc1; --line: #30394d;
+        --accent: #8b81f5; --accent-2: #5aa2f5; --success: #35c894; --warn: #eec368; --danger: #f47c7c;
+      }
+    }
+
+    .canvas { fill: var(--bg); }
+    .card { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+    .card-alt { fill: var(--surface-2); stroke: var(--line); stroke-width: 1.25; }
+    .title { fill: var(--ink); font-size: 12.5px; font-weight: 600; }
+    .sub { fill: var(--muted); font-size: 10px; }
+    .cap { fill: var(--muted); font-size: 10.5px; }
+    .mono { fill: var(--ink); font-size: 11px; font-weight: 600; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .accent-text { fill: var(--accent); font-size: 10.5px; font-weight: 600; }
+    .keep { fill: var(--success); font-size: 10px; font-weight: 600; }
+    .gone { fill: var(--danger); font-size: 10px; font-weight: 600; }
+    .wire { fill: none; stroke: var(--line); stroke-width: 1.5; }
+    .flow { fill: none; stroke: var(--accent); stroke-width: 1.7; stroke-linecap: round; stroke-dasharray: 5 9; }
+    .arrow { fill: var(--accent); }
+    .chip { fill: var(--surface-2); stroke: var(--line); stroke-width: 1; }
+    .probe { fill: none; stroke: var(--success); stroke-width: 2; }
+    .probe-bg { fill: none; stroke: var(--line); stroke-width: 2; }
+    .dot-ok { fill: var(--success); }
+    .dot-off { fill: var(--muted); opacity: .4; }
+
+    @keyframes rise-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes dash-flow { to { stroke-dashoffset: -28; } }
+    /* Health probes fill in sequence: this is the actual wait ./start performs. */
+    @keyframes fill-probe { 0%, 8% { stroke-dashoffset: 76; } 34%, 100% { stroke-dashoffset: 0; } }
+    @keyframes pop { 0%, 30% { opacity: 0; transform: scale(.6); } 44%, 100% { opacity: 1; transform: scale(1); } }
+
+    .stage { animation: rise-in .5s cubic-bezier(.22, .68, .24, 1) both; }
+    .s1 { animation-delay: .05s; } .s2 { animation-delay: .18s; } .s3 { animation-delay: .31s; } .s4 { animation-delay: .44s; }
+    .flow { animation: dash-flow 1.1s linear infinite; }
+    .probe { stroke-dasharray: 76; animation: fill-probe 5s ease-in-out infinite; }
+    .p2 { animation-delay: .9s; }
+    .tick { transform-origin: center; animation: pop 5s ease-out infinite; }
+    .t2 { animation-delay: .9s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .stage, .flow, .probe, .tick { animation: none; }
+      .stage, .tick { opacity: 1; transform: none; }
+      .probe { stroke-dashoffset: 0; }
+    }
+  </style>
+
+  <rect class="canvas" width="1060" height="340" rx="18"/>
+
+  <!-- start sequence -->
+  <g class="stage s1">
+    <text class="accent-text" x="36" y="42">./start · Docker only, in this order</text>
+  </g>
+
+  <g class="stage s1">
+    <rect class="card" x="36" y="56" width="170" height="86" rx="11"/>
+    <text class="title" x="54" y="80">PostgreSQL</text>
+    <text class="sub" x="54" y="97">localhost:5433</text>
+    <circle class="probe-bg" cx="70" cy="118" r="12"/>
+    <circle class="probe" cx="70" cy="118" r="12" transform="rotate(-90 70 118)"/>
+    <g class="tick"><circle class="dot-ok" cx="70" cy="118" r="4"/></g>
+    <text class="sub" x="92" y="122">health probe</text>
+  </g>
+  <path class="wire" d="M206 99 H246"/><path class="flow" d="M206 99 H246"/>
+  <polygon class="arrow" points="246,99 239,95 239,103"/>
+
+  <g class="stage s2">
+    <rect class="card" x="254" y="56" width="186" height="86" rx="11"/>
+    <text class="title" x="272" y="80">Compose profiles</text>
+    <text class="sub" x="272" y="97">discover local engines</text>
+    <text class="cap" x="272" y="122">root composition chooses them</text>
+  </g>
+  <path class="wire" d="M440 99 H480"/><path class="flow" d="M440 99 H480"/>
+  <polygon class="arrow" points="480,99 473,95 473,103"/>
+
+  <g class="stage s3">
+    <rect class="card" x="488" y="56" width="212" height="86" rx="11"/>
+    <text class="title" x="506" y="80">every local engine</text>
+    <text class="sub" x="506" y="97">discovered by Compose profile</text>
+    <circle class="probe-bg" cx="522" cy="118" r="12"/>
+    <circle class="probe p2" cx="522" cy="118" r="12" transform="rotate(-90 522 118)"/>
+    <g class="tick t2"><circle class="dot-ok" cx="522" cy="118" r="4"/></g>
+    <text class="sub" x="544" y="122">/health, one per engine</text>
+  </g>
+  <path class="wire" d="M700 99 H740"/><path class="flow" d="M700 99 H740"/>
+  <polygon class="arrow" points="740,99 733,95 733,103"/>
+
+  <g class="stage s4">
+    <rect class="card-alt" x="748" y="56" width="276" height="86" rx="11"/>
+    <text class="title" x="766" y="80">infrastructure ready</text>
+    <text class="sub" x="766" y="97">services and published ports</text>
+    <text class="cap" x="766" y="122">no migration or application command</text>
+  </g>
+
+  <!-- what each command keeps -->
+  <text class="accent-text" x="36" y="186">what survives which command</text>
+
+  <g class="stage s3">
+    <rect class="card" x="36" y="200" width="988" height="112" rx="12"/>
+
+    <text class="cap" x="56" y="224">command</text>
+    <text class="cap" x="266" y="224">containers</text>
+    <text class="cap" x="430" y="224">database volume</text>
+    <text class="cap" x="620" y="224">application artifacts</text>
+    <text class="cap" x="830" y="224">model weights</text>
+
+    <text class="mono" x="56" y="250">--stop</text>
+    <text class="gone" x="266" y="250">removed</text>
+    <text class="keep" x="430" y="250">kept</text>
+    <text class="keep" x="620" y="250">kept</text>
+    <text class="keep" x="830" y="250">kept</text>
+
+    <text class="mono" x="56" y="274">--clean</text>
+    <text class="gone" x="266" y="274">removed</text>
+    <text class="gone" x="430" y="274">removed</text>
+    <text class="keep" x="620" y="274">kept</text>
+    <text class="keep" x="830" y="274">kept · deliberately</text>
+
+    <text class="mono" x="56" y="298">--purge-models</text>
+    <text class="gone" x="266" y="298">removed</text>
+    <text class="keep" x="430" y="298">kept</text>
+    <text class="keep" x="620" y="298">kept</text>
+    <text class="gone" x="830" y="298">removed</text>
+  </g>
+
+  <text class="cap" x="36" y="330">volume retention is declared in root Compose metadata; the generic orchestrator carries no provider volume names</text>
+</svg>

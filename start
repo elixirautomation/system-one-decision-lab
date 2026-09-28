@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Infrastructure entry point. Docker only — see packages/infra/orchestrator.
+set -euo pipefail
+exec "$(dirname "$0")/packages/infra/orchestrator/bin/start-services.sh" "$@"

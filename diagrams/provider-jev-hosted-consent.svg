@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 286" width="900" height="286" role="img" aria-labelledby="title desc">
+  <title id="title">A hosted endpoint makes consent a precondition, and calibrated confidence gates the action</title>
+  <desc id="desc">Jev resolves to a remote endpoint, so evidence would leave the machine and egress consent is required before a request is sent. A bearer token is mandatory at every endpoint. Because Jev reports calibrated choice confidence, its gate reads the confidence field rather than probability mass.</desc>
+  <style>
+    svg{--bg:#f4f6fb;--surface:#fff;--ink:#172033;--muted:#68748a;--line:#e2e6ef;--accent:#5a4df0;--success:#17a673;--warn:#c2410c;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    @media(prefers-color-scheme:dark){svg{--bg:#111522;--surface:#181e2e;--ink:#edf1fb;--muted:#a6afc1;--line:#30394d;--accent:#8b81f5;--success:#35c894;--warn:#fb923c}}
+    .bg{fill:var(--bg)}.card{fill:var(--surface);stroke:var(--line);stroke-width:1.5}.gate{fill:var(--surface);stroke:var(--warn);stroke-width:1.5}.title{fill:var(--ink);font-size:15px;font-weight:650}.sub{fill:var(--muted);font-size:11px}.cap{fill:var(--accent);font-size:11px;font-weight:650}.warnt{fill:var(--warn);font-size:11px;font-weight:650}.wire{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-dasharray:6 8}.arrow{fill:var(--accent)}.ok{fill:var(--success)}.stop{fill:var(--warn)}
+    @keyframes rise-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@keyframes dash-flow{to{stroke-dashoffset:-28}}@keyframes breathe{50%{opacity:.55}}
+    .stage{animation:rise-in .5s ease both}.s2{animation-delay:.15s}.s3{animation-delay:.3s}.wire{animation:dash-flow 1.2s linear infinite}.ok,.stop{animation:breathe 2s ease-in-out infinite}
+    @media(prefers-reduced-motion:reduce){.stage,.wire,.ok,.stop{animation:none}.stage{opacity:1;transform:none}}
+  </style>
+  <rect class="bg" width="900" height="286" rx="18"/>
+  <text class="cap" x="36" y="35">hosted endpoint: consent is a precondition, not a preference</text>
+  <g class="stage">
+    <rect class="card" x="36" y="62" width="206" height="136" rx="12"/>
+    <text class="title" x="56" y="92">Resolved endpoint</text>
+    <text class="sub" x="56" y="116">api.typesafe.ai</text>
+    <text class="sub" x="56" y="136">classified: remote</text>
+    <text class="sub" x="56" y="164">JEV_API_KEY required</text>
+    <text class="sub" x="56" y="182">at every endpoint</text>
+  </g>
+  <path class="wire" d="M242 130 H301"/><polygon class="arrow" points="301,130 292,125 292,135"/>
+  <g class="stage s2">
+    <rect class="gate" x="309" y="62" width="236" height="136" rx="12"/>
+    <text class="title" x="329" y="92">Egress consent</text>
+    <circle class="stop" cx="334" cy="116" r="4"/><text class="sub" x="348" y="120">refused by default</text>
+    <circle class="ok" cx="334" cy="140" r="4"/><text class="sub" x="348" y="144">ALLOW_DECISION_DATA_EGRESS</text>
+    <text class="warnt" x="329" y="172">evidence leaves this machine</text>
+    <text class="sub" x="329" y="190">no secrets, no personal data</text>
+  </g>
+  <path class="wire" d="M545 130 H604"/><polygon class="arrow" points="604,130 595,125 595,135"/>
+  <g class="stage s3">
+    <rect class="card" x="612" y="62" width="252" height="136" rx="12"/>
+    <text class="title" x="632" y="92">Confidence gate</text>
+    <text class="sub" x="632" y="116">calibrated: reads confidence</text>
+    <circle class="ok" cx="637" cy="140" r="4"/><text class="sub" x="651" y="144">act at 0.75 and above</text>
+    <circle class="ok" cx="637" cy="164" r="4"/><text class="sub" x="651" y="168">review at 0.45 and above</text>
+    <text class="sub" x="632" y="190">below review: escalate</text>
+  </g>
+  <text class="sub" x="36" y="248">Declared defaults, not measured accuracy. Out of the box (not trained on our data), confidence was anti-correlated</text>
+  <text class="sub" x="36" y="266">with correctness on nine hand-labelled failures, so tune thresholds against your own labels before trusting them.</text>
+</svg>

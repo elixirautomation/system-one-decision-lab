@@ -1,0 +1,208 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 420" width="1180" height="420" role="img"
+     aria-labelledby="labTitle labDesc">
+  <title id="labTitle">How the lab is put together</title>
+  <desc id="labDesc">Any domain brings its own evidence and becomes a use-case package. Every use case
+  asks the same System One contract, so the engine answering — Laya on this host, or the hosted Jev API — is
+  configuration rather than a second integration. Each answer passes a provider-specific confidence gate and is
+  stored in one shared decisions table that records which engine answered, which is what makes engines
+  comparable on identical evidence.</desc>
+
+  <style>
+    /* Design tokens mirror src/report/report-assets.ts so every diagram in this
+       repository reads as part of the product rather than as a separate
+       illustration. The block is duplicated in each SVG on purpose: a diagram
+       embedded with &lt;img&gt; cannot load an external stylesheet, so being
+       self-contained is what makes it render at all. */
+    svg {
+      --bg: #f4f6fb; --surface: #fff; --surface-2: #f8f9fc;
+      --ink: #172033; --muted: #68748a; --line: #e2e6ef;
+      --accent: #5a4df0; --accent-2: #2f80ed; --success: #17a673; --warn: #e2a93b;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --bg: #111522; --surface: #181e2e; --surface-2: #202739;
+        --ink: #edf1fb; --muted: #a6afc1; --line: #30394d;
+        --accent: #8b81f5; --accent-2: #5aa2f5; --success: #35c894; --warn: #eec368;
+      }
+    }
+
+    .canvas { fill: var(--bg); }
+    .card { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+    .card-alt { fill: var(--surface-2); stroke: var(--line); stroke-width: 1.25; }
+    .group { fill: none; stroke: var(--line); stroke-width: 1.25; stroke-dasharray: 3 4; }
+    .title { fill: var(--ink); font-size: 13px; font-weight: 600; }
+    .sub { fill: var(--muted); font-size: 10.5px; }
+    .cap { fill: var(--muted); font-size: 11px; }
+    .lede { fill: var(--ink); font-size: 11.5px; font-weight: 600; }
+    .accent-text { fill: var(--accent); font-size: 10.5px; font-weight: 600; }
+    .ok-text { fill: var(--success); font-size: 10.5px; font-weight: 600; }
+    .warn-text { fill: var(--warn); font-size: 10.5px; font-weight: 600; }
+    .wire { fill: none; stroke: var(--line); stroke-width: 1.5; }
+    .flow { fill: none; stroke: var(--accent); stroke-width: 1.75; stroke-linecap: round; stroke-dasharray: 5 9; }
+    .arrow { fill: var(--accent); }
+    .chip { fill: var(--surface-2); stroke: var(--line); stroke-width: 1; }
+    .dot { fill: var(--accent); }
+    .dot-ok { fill: var(--success); }
+    .glow { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; }
+
+    /* Shared keyframe vocabulary with the report and the other diagrams: a
+       staggered entrance, a flowing connector, and a highlight that walks the eye
+       through the stages in reading order. */
+    @keyframes rise-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes dash-flow { to { stroke-dashoffset: -28; } }
+    @keyframes walk { 0%, 8% { opacity: 0; } 2% { opacity: .85; } 16%, 100% { opacity: 0; } }
+    @keyframes breathe { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+    /* Only for the two engine cards: selection alternates, which is the point —
+       the same evidence can be answered by either without a second integration. */
+    @keyframes swap-a { 0%, 42% { opacity: 1; } 50%, 92% { opacity: .25; } 100% { opacity: 1; } }
+    @keyframes swap-b { 0%, 42% { opacity: .25; } 50%, 92% { opacity: 1; } 100% { opacity: .25; } }
+
+    .stage { animation: rise-in .55s cubic-bezier(.22, .68, .24, 1) both; }
+    .s1 { animation-delay: .05s; } .s2 { animation-delay: .18s; } .s3 { animation-delay: .31s; }
+    .s4 { animation-delay: .44s; } .s5 { animation-delay: .57s; } .s6 { animation-delay: .70s; }
+    .trailing { animation: rise-in .5s ease .84s both; }
+    .flow { animation: dash-flow 1.1s linear infinite; }
+    .pulse { animation: breathe 2.6s ease-in-out infinite; }
+    .engine-a { animation: swap-a 7s ease-in-out infinite; }
+    .engine-b { animation: swap-b 7s ease-in-out infinite; }
+    .glow { animation: walk 7s linear infinite; }
+    .g1 { animation-delay: .9s; } .g2 { animation-delay: 2.0s; } .g3 { animation-delay: 3.1s; }
+    .g4 { animation-delay: 4.2s; } .g5 { animation-delay: 5.3s; }
+
+    /* Motion is decoration: every label and connector is already in its final
+       position, so removing it loses nothing but the guided reading order. */
+    @media (prefers-reduced-motion: reduce) {
+      .stage, .trailing, .flow, .pulse, .engine-a, .engine-b, .glow { animation: none; }
+      .stage, .trailing { opacity: 1; transform: none; }
+      .engine-a, .engine-b { opacity: 1; }
+      .glow { opacity: 0; }
+    }
+  </style>
+
+  <rect class="canvas" width="1180" height="420" rx="18"/>
+
+  <!-- 1 · any domain's evidence -->
+  <g class="stage s1">
+    <text class="cap" x="40" y="46">Your domain brings evidence</text>
+    <rect class="chip" x="40" y="60" width="176" height="30" rx="8"/>
+    <text class="sub" x="54" y="79">a failed end-to-end test</text>
+    <rect class="chip" x="40" y="96" width="176" height="30" rx="8"/>
+    <text class="sub" x="54" y="115">a merge request diff</text>
+    <rect class="chip" x="40" y="132" width="176" height="30" rx="8"/>
+    <text class="sub" x="54" y="151">a log line, a metric, …</text>
+  </g>
+
+  <!-- 2 · one package per use case -->
+  <g class="stage s2">
+    <rect class="group" x="28" y="190" width="200" height="118" rx="12"/>
+    <text class="accent-text" x="40" y="212">packages/usecases/*</text>
+    <rect class="card" x="40" y="222" width="176" height="34" rx="9"/>
+    <text class="title" x="54" y="244">playwright-decisions</text>
+    <rect class="card-alt" x="40" y="262" width="176" height="34" rx="9"/>
+    <text class="sub" x="54" y="284">your next use case</text>
+  </g>
+
+  <path class="wire" d="M228 249 H288"/>
+  <path class="flow" d="M228 249 H288"/>
+  <polygon class="arrow" points="288,249 281,245 281,253"/>
+
+  <!-- 3 · the one contract -->
+  <g class="stage s3">
+    <rect class="card" x="296" y="196" width="196" height="106" rx="12"/>
+    <text class="lede" x="316" y="224">One contract</text>
+    <text class="sub" x="316" y="244">POST /v1/systemone</text>
+    <rect class="chip" x="316" y="256" width="60" height="22" rx="6"/>
+    <text class="sub" x="326" y="271">choice</text>
+    <rect class="chip" x="382" y="256" width="52" height="22" rx="6"/>
+    <text class="sub" x="392" y="271">score</text>
+    <rect class="chip" x="440" y="256" width="46" height="22" rx="6"/>
+    <text class="sub" x="450" y="271">noul</text>
+    <text class="cap" x="316" y="294">@sysone/decision-core</text>
+  </g>
+
+  <path class="wire" d="M492 249 H556"/>
+  <path class="flow" d="M492 249 H556"/>
+  <polygon class="arrow" points="556,249 549,245 549,253"/>
+
+  <!-- 4 · two engines, selected by configuration -->
+  <g class="stage s4">
+    <text class="cap" x="566" y="176">DECISION_PROVIDER decides who answers</text>
+    <g class="engine-a">
+      <rect class="card" x="566" y="188" width="208" height="54" rx="11"/>
+      <circle class="dot-ok" cx="586" cy="215" r="5"/>
+      <text class="title" x="600" y="211">Laya · on this host</text>
+      <text class="ok-text" x="600" y="228">no data egress</text>
+    </g>
+    <g class="engine-b">
+      <rect class="card" x="566" y="256" width="208" height="54" rx="11"/>
+      <circle class="dot" cx="586" cy="283" r="5"/>
+      <text class="title" x="600" y="279">Jev · hosted API</text>
+      <text class="warn-text" x="600" y="296">egress needs consent</text>
+    </g>
+  </g>
+
+  <path class="wire" d="M774 215 H830 V240"/>
+  <path class="wire" d="M774 283 H830 V258"/>
+  <path class="flow" d="M774 215 H830 V249"/>
+  <path class="flow" d="M774 283 H830 V249"/>
+  <path class="wire" d="M830 249 H866"/>
+  <polygon class="arrow" points="866,249 859,245 859,253"/>
+
+  <!-- 5 · the gate -->
+  <g class="stage s5">
+    <rect class="card" x="874" y="196" width="128" height="106" rx="12"/>
+    <text class="lede" x="890" y="222">Gate</text>
+    <text class="sub" x="890" y="241">per provider</text>
+    <circle class="dot-ok" cx="894" cy="258" r="4"/>
+    <text class="sub" x="906" y="262">auto file</text>
+    <circle class="dot" cx="894" cy="276" r="4"/>
+    <text class="sub" x="906" y="280">review</text>
+    <circle class="dot" cx="894" cy="294" r="4" opacity=".45"/>
+    <text class="sub" x="906" y="298">escalate</text>
+  </g>
+
+  <path class="wire" d="M1002 249 H1040"/>
+  <path class="flow" d="M1002 249 H1040"/>
+  <polygon class="arrow" points="1040,249 1033,245 1033,253"/>
+
+  <!-- 6 · one shared table -->
+  <g class="stage s6">
+    <rect class="card" x="1048" y="188" width="104" height="130" rx="12"/>
+    <text class="lede" x="1062" y="214">decisions</text>
+    <text class="sub" x="1062" y="232">one table</text>
+    <rect class="chip" x="1062" y="242" width="76" height="20" rx="5"/>
+    <text class="sub" x="1070" y="256">provider</text>
+    <rect class="chip" x="1062" y="266" width="76" height="20" rx="5"/>
+    <text class="sub" x="1070" y="280">subject</text>
+    <rect class="chip" x="1062" y="290" width="76" height="20" rx="5"/>
+    <text class="sub" x="1070" y="304">routing</text>
+  </g>
+
+  <!-- the payoff, stated rather than implied -->
+  <g class="trailing">
+    <path class="wire" d="M1100 326 V348 H360 V310" stroke-dasharray="4 6"/>
+    <polygon class="arrow" points="360,304 356,311 364,311"/>
+    <text class="accent-text" x="700" y="342">same evidence, another engine — comparable afterwards</text>
+  </g>
+
+  <!-- 7 · who works where -->
+  <g class="trailing">
+    <rect class="card-alt" x="40" y="356" width="360" height="40" rx="10"/>
+    <circle class="dot" cx="60" cy="376" r="5"/>
+    <text class="sub" x="74" y="380">contribute an engine → packages/providers/&lt;id&gt;</text>
+    <rect class="card-alt" x="416" y="356" width="392" height="40" rx="10"/>
+    <circle class="dot-ok" cx="436" cy="376" r="5"/>
+    <text class="sub" x="450" y="380">contribute a domain → packages/usecases/&lt;your use case&gt;</text>
+    <text class="cap" x="828" y="380">infra is shared; use cases never depend on each other</text>
+  </g>
+
+  <!-- the walking highlight, in reading order -->
+  <g>
+    <rect class="glow g1" x="40" y="222" width="176" height="34" rx="9"/>
+    <rect class="glow g2" x="296" y="196" width="196" height="106" rx="12"/>
+    <rect class="glow g3" x="566" y="188" width="208" height="54" rx="11"/>
+    <rect class="glow g4" x="874" y="196" width="128" height="106" rx="12"/>
+    <rect class="glow g5" x="1048" y="188" width="104" height="130" rx="12"/>
+  </g>
+</svg>
