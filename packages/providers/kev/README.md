@@ -66,4 +66,6 @@ Kev's Choice `confidence` is `(p_max − 1/K) / (1 − 1/K)`: a rescaling of the
 
 > **Not measured on this lab's data.** Upstream reports Kev-0.8B at 0.648 development accuracy on sources it never trained on, well below Kev-4B and hosted Jev. In this lab, one out-of-the-box smoke request (a single literal DNS `ERR_NAME_NOT_RESOLVED`, not a sample) answered `unknown` at 0.46 probability, with `infrastructure_failure` second at 0.25 — routed to review, not acted on. Treat that as evidence the container works, not as accuracy.
 
+To fine-tune a checkpoint on your own labelled decisions and serve it here, see [Fine-tuning Kev locally](TRAINING.md).
+
 Run `yarn workspace @sysone/provider-kev check`.
