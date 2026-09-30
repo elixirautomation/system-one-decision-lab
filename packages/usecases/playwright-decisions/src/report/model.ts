@@ -64,6 +64,15 @@ export interface ReportSource {
   decisions: SourceDecision[];
 }
 
+/** One engine's latest answer about a test case, kept so a later engine cannot hide it. */
+export interface EngineDecisionView {
+  provider: DecisionProvider;
+  model: string;
+  category: string | null;
+  confidence: number | null;
+  recommendedAction: string | null;
+}
+
 export interface CurrentTestView {
   id: string;
   title: string;
@@ -83,6 +92,8 @@ export interface CurrentTestView {
   hasModelDecision: boolean;
   decisionProvider: DecisionProvider | null;
   probabilities: Record<string, number>;
+  /** Latest triage from every other engine that answered this case, newest first. */
+  otherEngineDecisions: EngineDecisionView[];
 }
 
 export interface FailureClusterView {
@@ -111,6 +122,8 @@ export interface CurrentRunView {
   passRate: number;
   durationMs: number;
   triaged: number;
+  /** Test cases in this run each engine triaged; one case may count for several engines. */
+  providerCounts: Record<string, number>;
   tests: CurrentTestView[];
   failureClusters: FailureClusterView[];
 }

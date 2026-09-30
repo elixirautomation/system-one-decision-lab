@@ -7,9 +7,10 @@ import {
   type SystemOneClientOptions,
 } from '@sysone/decision-core';
 import { jevProvider } from '@sysone/provider-jev';
+import { kevProvider } from '@sysone/provider-kev';
 import { layaProvider } from '@sysone/provider-laya';
 
-export const LAB_PROVIDER_DEFINITIONS = [jevProvider, layaProvider] as const;
+export const LAB_PROVIDER_DEFINITIONS = [jevProvider, layaProvider, kevProvider] as const;
 export const LAB_PROVIDER_IDS = LAB_PROVIDER_DEFINITIONS.map((provider) => provider.id);
 export const DEFAULT_LAB_PROVIDER_ID = jevProvider.id;
 export const labProviderRegistry = new DecisionProviderRegistry(LAB_PROVIDER_DEFINITIONS);

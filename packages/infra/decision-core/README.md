@@ -61,7 +61,7 @@ import { createDecisionClient } from '@sysone/decision-core';
 
 const client = createDecisionClient();          // resolves DECISION_PROVIDER from the environment
 
-client.provider;        // 'laya' | 'jev' | your engine's id
+client.provider;        // 'laya' | 'kev' | 'jev' | your engine's id
 client.providerLabel;   // 'Laya' — for reports and badges
 client.config.endpoint; // resolved URL
 client.config.endpointScope; // 'local' | 'remote'
@@ -222,6 +222,7 @@ Selection is configuration, not a second client. The shell wins over `.env`, so 
 
 ```bash
 DECISION_PROVIDER=laya yarn lab experiment:choice   # local, nothing leaves the host
+DECISION_PROVIDER=kev  yarn lab experiment:choice   # local, nothing leaves the host
 DECISION_PROVIDER=jev  yarn lab experiment:choice   # hosted, requires egress consent
 ```
 
@@ -385,6 +386,7 @@ Engine-specific configuration lives with the adapter that owns it. This package 
 |---|---|---|---|
 | Laya | [`@sysone/provider-laya`](../../providers/laya/README.md) | self-hosted, zero egress | `top_probability` |
 | Jev | [`@sysone/provider-jev`](../../providers/jev/README.md) | hosted, egress consent required | `confidence` |
+| Kev | [`@sysone/provider-kev`](../../providers/kev/README.md) | self-hosted, zero egress | `top_probability` |
 
 What remains generic is below: how declared requirements are enforced without knowing which provider is being enforced, how to tune the gate once you have labels, and what adding an engine involves.
 
@@ -412,7 +414,7 @@ Provider "jev" is missing required configuration:
 <details>
 <summary><b>Tuning the gate against your own labels</b></summary>
 
-Neither engine's thresholds are tuned against labelled data. Override them once you have ground truth:
+No engine's thresholds are tuned against labelled data. Override them once you have ground truth:
 
 ```dotenv
 DECISION_CHOICE_GATE=confidence     # or top_probability
@@ -422,7 +424,7 @@ DECISION_REVIEW_THRESHOLD=0.35
 
 Overrides are shared across engines deliberately: once you have labels you tune one active configuration, not a table of vendors.
 
-Do not assume a high number means a correct answer — out of the box (neither engine was trained or tuned on this lab's data), on a small private sample of hand-labelled failures, confidence and correctness were anti-correlated for the calibrated engine, and uninformative for the uncalibrated one. Each provider README records what was actually observed for that engine. Measuring it properly is what [`.kiro/specs/decision-eval`](../../../.kiro/specs/decision-eval/requirements.md) is for.
+Do not assume a high number means a correct answer — out of the box (no engine was trained or tuned on this lab's data), on a small private sample of hand-labelled failures, confidence and correctness were anti-correlated for Jev and uninformative for Laya; Kev has not been measured on that sample. Each provider README records what was actually observed for that engine. Measuring it properly is what [`.kiro/specs/decision-eval`](../../../.kiro/specs/decision-eval/requirements.md) is for.
 
 </details>
 

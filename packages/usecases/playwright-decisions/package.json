@@ -29,6 +29,7 @@
     "@sysone/decision-core": "workspace:^",
     "@sysone/decision-store": "workspace:^",
     "@sysone/provider-jev": "workspace:^",
+    "@sysone/provider-kev": "workspace:^",
     "@sysone/provider-laya": "workspace:^",
     "drizzle-orm": "0.45.3",
     "pg": "8.13.1"

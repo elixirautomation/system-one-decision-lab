@@ -48,10 +48,40 @@ services:
       retries: 60
       start_period: 900s
 
+  kev:
+    profiles: ["kev"]
+    build:
+      context: ./packages/providers/kev
+      dockerfile: Dockerfile
+      args:
+        TORCH_INDEX: ${KEV_TORCH_INDEX:-cpu}
+    init: true
+    environment:
+      KEV_RUN: ${KEV_RUN:-jaredpalmer/kev-0.8b}
+      KEV_PORT: "8009"
+      KEV_API_KEY: ${KEV_API_KEY:-}
+      KEV_DTYPE: ${KEV_DTYPE:-}
+      KEV_DATE_FACTS: ${KEV_DATE_FACTS:-0}
+      OMP_NUM_THREADS: ${KEV_THREADS:-4}
+      HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-0}
+    ports:
+      - "${KEV_HOST_PORT:-8009}:8009"
+    volumes:
+      - kev-model-cache:/home/kev/.cache/huggingface
+    # The server loads the checkpoint before it binds, so any answer from
+    # /v1/models means ready. It is behind KEV_API_KEY when one is set.
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import os,urllib.request,sys; k=os.environ.get('KEV_API_KEY'); r=urllib.request.Request('http://127.0.0.1:8009/v1/models', headers={'Authorization': 'Bearer '+k} if k else {}); sys.exit(0 if urllib.request.urlopen(r,timeout=5).status==200 else 1)\""]
+      interval: 5s
+      timeout: 10s
+      retries: 60
+      start_period: 900s
+
 x-sysone-retention:
   clean: [postgres-data]
-  model-cache: [laya-model-cache]
+  model-cache: [laya-model-cache, kev-model-cache]
 
 volumes:
   postgres-data:
   laya-model-cache:
+  kev-model-cache:

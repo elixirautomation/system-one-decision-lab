@@ -186,6 +186,12 @@ function buildCurrent(group: PipelineGroup | undefined, decisions: SourceDecisio
     .map((test) => {
       const caseDecisions = decisionsByCase.get(test.id) ?? [];
       const decision = latestDecisionBy(caseDecisions, (item) => item.decisionType === 'failure_triage');
+      const latestPerEngine = new Map<string, SourceDecision>();
+      for (const item of caseDecisions
+        .filter((candidate) => candidate.decisionType === 'failure_triage' && candidate.provider !== decision?.provider)
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())) {
+        if (!latestPerEngine.has(item.provider)) latestPerEngine.set(item.provider, item);
+      }
       return {
         id: test.id,
         title: test.testName,
@@ -204,6 +210,13 @@ function buildCurrent(group: PipelineGroup | undefined, decisions: SourceDecisio
         hasModelDecision: Boolean(decision),
         decisionProvider: decision?.provider ?? null,
         probabilities: decisionProbabilities(decision),
+        otherEngineDecisions: [...latestPerEngine.values()].map((item) => ({
+          provider: item.provider,
+          model: item.model,
+          category: item.category,
+          confidence: item.confidence,
+          recommendedAction: item.recommendedAction,
+        })),
       };
     })
     .sort((a, b) => {
@@ -233,6 +246,12 @@ function buildCurrent(group: PipelineGroup | undefined, decisions: SourceDecisio
     passRate: stats.passRate,
     durationMs: stats.durationMs,
     triaged: tests.filter((test) => test.category).length,
+    providerCounts: countBy(
+      tests.flatMap((test) => [
+        ...(test.decisionProvider ? [test.decisionProvider] : []),
+        ...test.otherEngineDecisions.map((item) => item.provider),
+      ]),
+    ),
     tests,
     failureClusters: buildFailureClusters(tests),
   };

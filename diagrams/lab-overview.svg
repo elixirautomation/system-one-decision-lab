@@ -2,7 +2,7 @@
      aria-labelledby="labTitle labDesc">
   <title id="labTitle">How the lab is put together</title>
   <desc id="labDesc">Any domain brings its own evidence and becomes a use-case package. Every use case
-  asks the same System One contract, so the engine answering — Laya on this host, or the hosted Jev API — is
+  asks the same System One contract, so the engine answering — Laya or Kev on this host, or the hosted Jev API — is
   configuration rather than a second integration. Each answer passes a provider-specific confidence gate and is
   stored in one shared decisions table that records which engine answered, which is what makes engines
   comparable on identical evidence.</desc>
@@ -53,10 +53,10 @@
     @keyframes dash-flow { to { stroke-dashoffset: -28; } }
     @keyframes walk { 0%, 8% { opacity: 0; } 2% { opacity: .85; } 16%, 100% { opacity: 0; } }
     @keyframes breathe { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
-    /* Only for the two engine cards: selection alternates, which is the point —
-       the same evidence can be answered by either without a second integration. */
-    @keyframes swap-a { 0%, 42% { opacity: 1; } 50%, 92% { opacity: .25; } 100% { opacity: 1; } }
-    @keyframes swap-b { 0%, 42% { opacity: .25; } 50%, 92% { opacity: 1; } 100% { opacity: .25; } }
+    /* Only for the engine cards: selection rotates, which is the point — the
+       same evidence can be answered by any of them without a second integration.
+       One keyframe, phase-shifted per card by a negative delay. */
+    @keyframes swap { 0%, 28% { opacity: 1; } 33%, 95% { opacity: .25; } 100% { opacity: 1; } }
 
     .stage { animation: rise-in .55s cubic-bezier(.22, .68, .24, 1) both; }
     .s1 { animation-delay: .05s; } .s2 { animation-delay: .18s; } .s3 { animation-delay: .31s; }
@@ -64,8 +64,8 @@
     .trailing { animation: rise-in .5s ease .84s both; }
     .flow { animation: dash-flow 1.1s linear infinite; }
     .pulse { animation: breathe 2.6s ease-in-out infinite; }
-    .engine-a { animation: swap-a 7s ease-in-out infinite; }
-    .engine-b { animation: swap-b 7s ease-in-out infinite; }
+    .engine-a, .engine-b, .engine-c { animation: swap 9s ease-in-out infinite; }
+    .engine-b { animation-delay: -6s; } .engine-c { animation-delay: -3s; }
     .glow { animation: walk 7s linear infinite; }
     .g1 { animation-delay: .9s; } .g2 { animation-delay: 2.0s; } .g3 { animation-delay: 3.1s; }
     .g4 { animation-delay: 4.2s; } .g5 { animation-delay: 5.3s; }
@@ -73,9 +73,9 @@
     /* Motion is decoration: every label and connector is already in its final
        position, so removing it loses nothing but the guided reading order. */
     @media (prefers-reduced-motion: reduce) {
-      .stage, .trailing, .flow, .pulse, .engine-a, .engine-b, .glow { animation: none; }
+      .stage, .trailing, .flow, .pulse, .engine-a, .engine-b, .engine-c, .glow { animation: none; }
       .stage, .trailing { opacity: 1; transform: none; }
-      .engine-a, .engine-b { opacity: 1; }
+      .engine-a, .engine-b, .engine-c { opacity: 1; }
       .glow { opacity: 0; }
     }
   </style>
@@ -125,27 +125,35 @@
   <path class="flow" d="M492 249 H556"/>
   <polygon class="arrow" points="556,249 549,245 549,253"/>
 
-  <!-- 4 · two engines, selected by configuration -->
+  <!-- 4 · three engines, selected by configuration -->
   <g class="stage s4">
-    <text class="cap" x="566" y="176">DECISION_PROVIDER decides who answers</text>
+    <text class="cap" x="566" y="170">DECISION_PROVIDER decides who answers</text>
     <g class="engine-a">
-      <rect class="card" x="566" y="188" width="208" height="54" rx="11"/>
-      <circle class="dot-ok" cx="586" cy="215" r="5"/>
-      <text class="title" x="600" y="211">Laya · on this host</text>
-      <text class="ok-text" x="600" y="228">no data egress</text>
+      <rect class="card" x="566" y="180" width="208" height="42" rx="10"/>
+      <circle class="dot-ok" cx="586" cy="201" r="5"/>
+      <text class="title" x="600" y="198">Laya · on this host</text>
+      <text class="ok-text" x="600" y="213">no data egress</text>
     </g>
     <g class="engine-b">
-      <rect class="card" x="566" y="256" width="208" height="54" rx="11"/>
-      <circle class="dot" cx="586" cy="283" r="5"/>
-      <text class="title" x="600" y="279">Jev · hosted API</text>
-      <text class="warn-text" x="600" y="296">egress needs consent</text>
+      <rect class="card" x="566" y="228" width="208" height="42" rx="10"/>
+      <circle class="dot-ok" cx="586" cy="249" r="5"/>
+      <text class="title" x="600" y="246">Kev · on this host</text>
+      <text class="ok-text" x="600" y="261">no data egress</text>
+    </g>
+    <g class="engine-c">
+      <rect class="card" x="566" y="276" width="208" height="42" rx="10"/>
+      <circle class="dot" cx="586" cy="297" r="5"/>
+      <text class="title" x="600" y="294">Jev · hosted API</text>
+      <text class="warn-text" x="600" y="309">egress needs consent</text>
     </g>
   </g>
 
-  <path class="wire" d="M774 215 H830 V240"/>
-  <path class="wire" d="M774 283 H830 V258"/>
-  <path class="flow" d="M774 215 H830 V249"/>
-  <path class="flow" d="M774 283 H830 V249"/>
+  <path class="wire" d="M774 201 H830 V240"/>
+  <path class="wire" d="M774 297 H830 V258"/>
+  <path class="wire" d="M774 249 H830"/>
+  <path class="flow" d="M774 201 H830 V249"/>
+  <path class="flow" d="M774 297 H830 V249"/>
+  <path class="flow" d="M774 249 H830"/>
   <path class="wire" d="M830 249 H866"/>
   <polygon class="arrow" points="866,249 859,245 859,253"/>
 
@@ -201,7 +209,7 @@
   <g>
     <rect class="glow g1" x="40" y="222" width="176" height="34" rx="9"/>
     <rect class="glow g2" x="296" y="196" width="196" height="106" rx="12"/>
-    <rect class="glow g3" x="566" y="188" width="208" height="54" rx="11"/>
+    <rect class="glow g3" x="562" y="176" width="216" height="146" rx="13"/>
     <rect class="glow g4" x="874" y="196" width="128" height="106" rx="12"/>
     <rect class="glow g5" x="1048" y="188" width="104" height="130" rx="12"/>
   </g>

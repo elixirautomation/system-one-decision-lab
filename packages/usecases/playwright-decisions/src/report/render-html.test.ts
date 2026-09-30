@@ -159,6 +159,13 @@ describe('decision provider attribution', () => {
     assert.doesNotMatch(jevHtml, /<b>Laya<\/b>/);
   });
 
+  it('labels a Kev-produced decision as Kev, never as Jev or Laya', () => {
+    const kevHtml = renderWithProvider('kev', 'kev-latest');
+    assert.match(kevHtml, /class="decision-mark"[^>]*>\s*<i class="ico">[\s\S]*?<b>Kev<\/b>/);
+    assert.doesNotMatch(kevHtml, /<b>(Jev|Laya)<\/b>/);
+    assert.match(kevHtml, /Kev decisions/);
+  });
+
   it('falls back to a neutral label when providers are mixed', () => {
     const decision = source.decisions[0];
     if (!decision) throw new Error('fixture is missing its decision');
@@ -186,7 +193,61 @@ describe('decision provider attribution', () => {
     assert.match(mixed, /<b>Jev<\/b>/);
   });
 
-  it('summarises decision counts per provider in the header', () => {
-    assert.match(renderWithProvider('laya', 'laya-rl-agent'), /Laya 1</);
+  it('summarises decision counts per provider in the header as engine badges', () => {
+    const html = renderWithProvider('laya', 'laya-rl-agent');
+    const header = html.slice(html.indexOf('<header'), html.indexOf('</header>'));
+    assert.match(header, /class="provider-summary"[\s\S]*?class="decision-mark"[^>]*>\s*<i class="ico">[\s\S]*?<b>Laya<\/b><span class="mark-count">1<\/span>/);
+  });
+
+  function twoEnginesOnOneCase(): string {
+    const decision = source.decisions[0];
+    if (!decision) throw new Error('fixture is missing its decision');
+    return renderDashboardHtml(
+      buildDashboardReport(
+        {
+          ...source,
+          decisions: [
+            { ...decision, id: 'kev-first', provider: 'kev', model: 'kev-latest', category: 'infrastructure_failure', createdAt: new Date('2026-09-23T08:01:00Z') },
+            { ...decision, id: 'laya-later', provider: 'laya', model: 'laya-rl-agent', category: 'automation_bug', createdAt: new Date('2026-09-23T08:02:00Z') },
+          ],
+        },
+        new Date('2026-09-23T09:00:00Z'),
+      ),
+    );
+  }
+
+  it('keeps an earlier engine visible on the front page after another engine answers later', () => {
+    const html = twoEnginesOnOneCase();
+    const current = html.slice(html.indexOf('id="panel-current"'), html.indexOf('id="panel-historical"'));
+    // Latest answer stays primary; Kev's earlier answer is still shown under its own badge.
+    assert.match(current, /<b>Laya<\/b>[\s\S]*?automation_bug/);
+    assert.match(current, /class="other-engines"[\s\S]*?<b>Kev<\/b><\/span><span class="pill category">infrastructure_failure/);
+    // Both engines are credited on the current-run metric card.
+    assert.match(current, /<b>Kev<\/b><span class="mark-count">1<\/span>/);
+    assert.match(current, /<b>Laya<\/b><span class="mark-count">1<\/span>/);
+  });
+
+  it('names the current run after its own engine even when the database is mixed', () => {
+    const decision = source.decisions[0];
+    if (!decision) throw new Error('fixture is missing its decision');
+    const html = renderDashboardHtml(
+      buildDashboardReport(
+        {
+          ...source,
+          decisions: [
+            { ...decision, provider: 'kev', model: 'kev-latest' },
+            // Another engine's decision about a case outside the current run.
+            { ...decision, id: 'elsewhere', testCaseId: 'case-elsewhere', provider: 'laya', model: 'laya-rl-agent' },
+          ],
+        },
+        new Date('2026-09-23T09:00:00Z'),
+      ),
+    );
+    const current = html.slice(html.indexOf('id="panel-current"'), html.indexOf('id="panel-historical"'));
+    assert.match(current, /Kev decisions/);
+    assert.match(current, /<th>Kev triage<\/th>/);
+    assert.doesNotMatch(current, /<b>Laya<\/b>/);
+    // The report-wide label stays neutral for a mixed database.
+    assert.match(html, /System One coverage/);
   });
 });

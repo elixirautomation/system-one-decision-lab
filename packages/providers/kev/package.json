@@ -1,0 +1,23 @@
+{
+  "name": "@sysone/provider-kev",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Kev adapter and local runtime for the System One provider contract",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test \"src/**/*.test.ts\"",
+    "check": "yarn typecheck && yarn test"
+  },
+  "dependencies": {
+    "@sysone/decision-core": "workspace:^"
+  },
+  "devDependencies": {
+    "tsx": "4.23.15",
+    "typescript": "5.7.2"
+  }
+}

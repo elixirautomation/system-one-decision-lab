@@ -13,7 +13,7 @@ These packages are shared by every use case. None imports an application.
 
 `config` has no README of its own: it is three functions — `findRepoRoot`, `loadLabEnv`, `databaseUrl` — and the contract a caller needs is precedence, which the [root README](../../README.md#configuration) already owns. `loadLabEnv({ overrideKeys })` is the one escape hatch: a caller names the keys for which the file must beat an ambient shell export.
 
-Concrete adapters live in `packages/providers/*` and depend on `@sysone/decision-core`. Each documents its own endpoint, credentials, capabilities and gate — [`jev`](../providers/jev/README.md), [`laya`](../providers/laya/README.md). Applications depend on the adapters they intentionally compose; core never imports them.
+Concrete adapters live in `packages/providers/*` and depend on `@sysone/decision-core`. Each documents its own endpoint, credentials, capabilities and gate — [`jev`](../providers/jev/README.md), [`laya`](../providers/laya/README.md), [`kev`](../providers/kev/README.md). Applications depend on the adapters they intentionally compose; core never imports them.
 
 ## Boundary rules
 

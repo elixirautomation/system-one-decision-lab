@@ -9,7 +9,7 @@ The lab exists to compare engines on the same evidence — not to promote one.
 
 [![check](https://github.com/elixirautomation/system-one-decision-lab/actions/workflows/check.yml/badge.svg)](https://github.com/elixirautomation/system-one-decision-lab/actions/workflows/check.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-`TypeSafe Jev` · hosted &nbsp;•&nbsp; `Laya` · self-hosted, Apache-2.0 &nbsp;•&nbsp; `PostgreSQL` &nbsp;•&nbsp; `Drizzle` &nbsp;•&nbsp; `Playwright`
+`TypeSafe Jev` · hosted &nbsp;•&nbsp; `Laya` · self-hosted, Apache-2.0 &nbsp;•&nbsp; `Kev` · self-hosted, Apache-2.0 &nbsp;•&nbsp; `PostgreSQL` &nbsp;•&nbsp; `Drizzle` &nbsp;•&nbsp; `Playwright`
 
 </div>
 
@@ -23,7 +23,7 @@ Bring evidence from your own domain — a failed end-to-end test, a merge reques
 
 Three properties are the point:
 
-**Engines are swappable.** `DECISION_PROVIDER=laya` and `DECISION_PROVIDER=jev` speak the same `POST /v1/systemone` protocol, so selecting one is configuration rather than a second integration.
+**Engines are swappable.** `DECISION_PROVIDER=laya`, `=kev` and `=jev` speak the same `POST /v1/systemone` protocol, so selecting one is configuration rather than a second integration.
 
 **Answers are gated, not trusted.** Engines do not share a confidence scale, so each declares how it should be routed to `auto_file` / `flag_for_review` / `escalate_to_human`.
 
@@ -138,7 +138,8 @@ packages/
 │   └── orchestrator/             generic Docker lifecycle
 ├── providers/
 │   ├── jev/                       hosted provider adapter
-│   └── laya/                      provider adapter + local runtime image
+│   ├── laya/                      provider adapter + local runtime image
+│   └── kev/                       provider adapter + local runtime image
 └── usecases/
     └── playwright-decisions/     application composition + domain evidence
 
@@ -231,4 +232,4 @@ Diagrams are held to the same bar. Every diagram lives in `diagrams/` and each R
 
 ## License
 
-[Apache-2.0](LICENSE). This project is independent and is not affiliated with, endorsed by, or sponsored by TypeSafe AI (Jev) or the Laya maintainers; see [`NOTICE`](NOTICE).
+[Apache-2.0](LICENSE). This project is independent and is not affiliated with, endorsed by, or sponsored by TypeSafe AI (Jev), the Laya maintainers, or the Kev maintainers; see [`NOTICE`](NOTICE).

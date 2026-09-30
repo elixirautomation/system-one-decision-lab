@@ -6,7 +6,7 @@ import type {
   TrendPoint,
 } from './model.js';
 import { stripAnsi } from '../triage/error-text.js';
-import { providerDisplayName } from './aggregate.js';
+import { decisionLabelFor, providerDisplayName } from './aggregate.js';
 import { REPORT_SCRIPT, REPORT_STYLES } from './report-assets.js';
 
 const SPARKLE_ICON = '<i class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.3c.7 4 2 6.6 3.9 8.5 1.9 1.9 4.5 3.2 8.5 3.9-4 .7-6.6 2-8.5 3.9-1.9 1.9-3.2 4.5-3.9 8.5-.7-4-2-6.6-3.9-8.5-1.9-1.9-4.5-3.2-8.5-3.9 4-.7 6.6-2 8.5-3.9 1.9-1.9 3.2-4.5 3.9-8.5z" fill="currentColor"/></svg></i>';
@@ -68,9 +68,20 @@ function renderProviderMark(provider: string | null | undefined, context: string
   return renderDecisionMark(name, `${name} ${context}`);
 }
 
-function metricCard(label: string, value: string | number, detail: string, tone = ''): string {
+/** One badge per engine with its own count, largest first. Names come from each row's provider. */
+function renderProviderCountMarks(counts: Record<string, number>, context: string): string {
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([provider, count]) => {
+      const name = providerDisplayName(provider);
+      return `<span class="decision-mark" title="${escapeHtml(`${count} ${name} ${context}`)}">${SPARKLE_ICON}<b>${escapeHtml(name)}</b><span class="mark-count">${count}</span></span>`;
+    })
+    .join('');
+}
+
+function metricCard(label: string, value: string | number, detail: string, tone = '', marks?: string): string {
   const decisionMark = tone.includes('decision-metric')
-    ? renderDecisionMark(activeDecisionLabel, `Metric backed by persisted ${activeDecisionLabel} decisions`)
+    ? marks ?? renderDecisionMark(activeDecisionLabel, `Metric backed by persisted ${activeDecisionLabel} decisions`)
     : '';
   return `<article class="metric-card ${tone}" data-metric="${escapeHtml(label)}"><span class="metric-label">${escapeHtml(label)}</span><strong>${escapeHtml(String(value))}</strong><span class="metric-detail">${escapeHtml(detail)}</span>${decisionMark}<div class="metric-bar" hidden></div></article>`;
 }
@@ -104,7 +115,13 @@ function renderProbabilityBars(probabilities: Record<string, number>): string {
 
 function renderTriage(test: CurrentTestView): string {
   if (!test.category) return '<span class="muted">No persisted triage decision</span>';
-  return `<div class="triage-block decision-surface"><div class="pill-row">${test.hasModelDecision ? renderProviderMark(test.decisionProvider, `classification via ${test.model ?? 'configured model'}`) : ''}<span class="pill category">${text(test.category)}</span>${test.recommendedAction ? `<span class="pill action">${text(test.recommendedAction.replaceAll('_', ' '))}</span>` : ''}${test.confidence === null ? '' : `<span class="confidence">${(test.confidence * 100).toFixed(0)}% confidence</span>`}</div>${renderProbabilityBars(test.probabilities)}${test.model ? `<span class="model">${text(test.model)}</span>` : ''}</div>`;
+  return `<div class="triage-block decision-surface"><div class="pill-row">${test.hasModelDecision ? renderProviderMark(test.decisionProvider, `classification via ${test.model ?? 'configured model'}`) : ''}<span class="pill category">${text(test.category)}</span>${test.recommendedAction ? `<span class="pill action">${text(test.recommendedAction.replaceAll('_', ' '))}</span>` : ''}${test.confidence === null ? '' : `<span class="confidence">${(test.confidence * 100).toFixed(0)}% confidence</span>`}</div>${renderProbabilityBars(test.probabilities)}${test.model ? `<span class="model">${text(test.model)}</span>` : ''}${renderOtherEngineDecisions(test)}</div>`;
+}
+
+/** Earlier answers from other engines stay visible, each under its own engine's badge. */
+function renderOtherEngineDecisions(test: CurrentTestView): string {
+  if (test.otherEngineDecisions.length === 0) return '';
+  return `<div class="other-engines">${test.otherEngineDecisions.map((item) => `<div class="pill-row">${renderProviderMark(item.provider, `also triaged this with ${item.model}`)}${item.category ? `<span class="pill category">${text(item.category)}</span>` : ''}${item.recommendedAction ? `<span class="pill action">${text(item.recommendedAction.replaceAll('_', ' '))}</span>` : ''}${item.confidence === null ? '' : `<span class="confidence">${(item.confidence * 100).toFixed(0)}% confidence</span>`}</div>`).join('')}</div>`;
 }
 
 function renderCurrentTestRows(current: CurrentRunView): string {
@@ -118,7 +135,7 @@ function renderCurrentTestRows(current: CurrentRunView): string {
 function renderNeedsAttention(current: CurrentRunView): string {
   const failures = current.tests.filter((test) => test.status === 'failed');
   if (failures.length === 0) return emptyState('No failures in the latest run', 'The current persisted pipeline has no failed executions.');
-  return `<div class="attention-list">${failures.map((test) => `<article class="attention-card"><div><span class="status failed">failed</span>${test.hasModelDecision ? renderProviderMark(test.decisionProvider, `triaged with ${test.model ?? 'configured model'}`) : ''}${test.category ? `<span class="pill category">${text(test.category)}</span>` : ''}</div><h3>${text(test.title)}</h3><p>${text(test.errorMessage?.split('\n')[0], 'No error message persisted')}</p><footer><span>${text(test.projectConfiguration)}</span><span>${formatDuration(test.durationMs)}</span>${test.recommendedAction ? `<span>${text(test.recommendedAction.replaceAll('_', ' '))}</span>` : ''}</footer></article>`).join('')}</div>`;
+  return `<div class="attention-list">${failures.map((test) => `<article class="attention-card"><div><span class="status failed">failed</span>${test.hasModelDecision ? renderProviderMark(test.decisionProvider, `triaged with ${test.model ?? 'configured model'}`) : ''}${test.otherEngineDecisions.map((item) => renderProviderMark(item.provider, `also triaged with ${item.model}`)).join('')}${test.category ? `<span class="pill category">${text(test.category)}</span>` : ''}</div><h3>${text(test.title)}</h3><p>${text(test.errorMessage?.split('\n')[0], 'No error message persisted')}</p><footer><span>${text(test.projectConfiguration)}</span><span>${formatDuration(test.durationMs)}</span>${test.recommendedAction ? `<span>${text(test.recommendedAction.replaceAll('_', ' '))}</span>` : ''}</footer></article>`).join('')}</div>`;
 }
 
 function renderFailureClusters(current: CurrentRunView): string {
@@ -128,15 +145,18 @@ function renderFailureClusters(current: CurrentRunView): string {
 
 function renderCurrent(report: DashboardReport): string {
   const current = report.current;
+  const currentLabel = current && Object.keys(current.providerCounts).length > 0
+    ? decisionLabelFor(current.providerCounts)
+    : activeDecisionLabel;
   if (!current) return `<section id="panel-current" class="tab-panel active" role="tabpanel">${emptyState('PostgreSQL has no runs', 'Run the Playwright suite or local seed, then generate the report again.')}</section>`;
   return `<section id="panel-current" class="tab-panel active" role="tabpanel">
     <div class="section-heading"><div><span class="eyebrow">LATEST PERSISTED PIPELINE</span><h2>${text(current.pipelineId)}</h2><p>${formatDate(current.triggeredAt)} · ${text(current.app)} · ${text(current.branch)}</p></div></div>
     ${renderSectionNav('Jump to current-run section', [['section-current-run-map', 'Run map'], ['section-current-triage', 'Triage queue'], ['section-current-causes', 'Root causes'], ['section-current-tests', 'All tests']])}
     ${renderInsightBanner('current-insight-banner')}
-    <div class="current-overview"><article class="ring-card">${renderPassRing(current.passRate)}<div><span>${current.total} executions</span><small>${formatDuration(current.durationMs)} pipeline duration</small></div></article>${metricCard('Passed', current.passed, 'final outcomes', 'success')}${metricCard('Failed', current.failed, 'need attention', current.failed ? 'danger' : '')}${metricCard('Skipped', current.skipped, 'not executed')}${metricCard('Retry recovered', current.retryRecovered, 'passed after retry', current.retryRecovered ? 'warning' : '')}${metricCard(`${activeDecisionLabel} decisions`, current.triaged, 'model-backed triage', current.triaged ? 'decision-metric' : '')}</div>
+    <div class="current-overview"><article class="ring-card">${renderPassRing(current.passRate)}<div><span>${current.total} executions</span><small>${formatDuration(current.durationMs)} pipeline duration</small></div></article>${metricCard('Passed', current.passed, 'final outcomes', 'success')}${metricCard('Failed', current.failed, 'need attention', current.failed ? 'danger' : '')}${metricCard('Skipped', current.skipped, 'not executed')}${metricCard('Retry recovered', current.retryRecovered, 'passed after retry', current.retryRecovered ? 'warning' : '')}${metricCard(`${currentLabel} decisions`, current.triaged, 'model-backed triage', current.triaged ? 'decision-metric' : '', renderProviderCountMarks(current.providerCounts, 'triage decision(s) in this run'))}</div>
     <article class="card" id="section-current-run-map"><div class="card-heading"><div><span class="eyebrow">RUN MAP</span><h3>Execution sequence</h3></div><span class="legend"><span><i class="passed"></i>Passed</span><span><i class="failed"></i>Failed</span><span><i class="skipped"></i>Skipped</span><span><i class="retried"></i>Retry</span></span></div>${renderRunStrip(current)}</article>
     <div class="two-column"><article class="card" id="section-current-triage"><div class="card-heading"><div><span class="eyebrow">TRIAGE QUEUE</span><h3>Needs attention</h3></div><span class="count-badge">${current.failed}</span></div>${renderNeedsAttention(current)}</article><article class="card" id="section-current-causes"><div class="card-heading"><div><span class="eyebrow">ROOT CAUSES</span><h3>Failure clusters</h3></div><span class="count-badge">${current.failureClusters.length}</span></div><div class="category-chart" hidden></div>${renderFailureClusters(current)}</article></div>
-    <article id="section-current-tests" class="card table-card"><div class="card-heading"><div><span class="eyebrow">CURRENT RESULTS</span><h3>Every persisted test</h3></div><span id="current-count">${current.tests.length} tests</span></div><div class="filters"><label><span class="sr-only">Search current tests</span><input id="current-search" type="search" placeholder="Search tests, suite, category or error…"></label><select id="current-status" aria-label="Filter current tests by status"><option value="all">All outcomes</option><option value="failed">Failed</option><option value="passed">Passed</option><option value="skipped">Skipped</option></select></div><div class="table-wrap"><table><thead><tr><th>Outcome</th><th>Test</th><th>Configuration</th><th>Duration</th><th>${escapeHtml(activeDecisionLabel)} triage</th></tr></thead><tbody>${renderCurrentTestRows(current)}</tbody></table></div></article>
+    <article id="section-current-tests" class="card table-card"><div class="card-heading"><div><span class="eyebrow">CURRENT RESULTS</span><h3>Every persisted test</h3></div><span id="current-count">${current.tests.length} tests</span></div><div class="filters"><label><span class="sr-only">Search current tests</span><input id="current-search" type="search" placeholder="Search tests, suite, category or error…"></label><select id="current-status" aria-label="Filter current tests by status"><option value="all">All outcomes</option><option value="failed">Failed</option><option value="passed">Passed</option><option value="skipped">Skipped</option></select></div><div class="table-wrap"><table><thead><tr><th>Outcome</th><th>Test</th><th>Configuration</th><th>Duration</th><th>${escapeHtml(currentLabel)} triage</th></tr></thead><tbody>${renderCurrentTestRows(current)}</tbody></table></div></article>
   </section>`;
 }
 
@@ -222,12 +242,9 @@ function serializeReport(report: DashboardReport): string {
 
 export function renderDashboardHtml(report: DashboardReport): string {
   activeDecisionLabel = report.decisionLabel;
-  const providerSummary = Object.entries(report.summary.providerCounts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([provider, count]) => `${providerDisplayName(provider)} ${count}`)
-    .join(' · ');
+  const providerSummary = renderProviderCountMarks(report.summary.providerCounts, 'decision(s) persisted');
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>System One Decision Lab</title><style>${REPORT_STYLES}</style></head><body><main class="shell">
-    <header class="topbar"><div class="brand"><span class="brand-mark">${SPARKLE_ICON}</span><div><h1>System One Decision Lab</h1><p>Fast model decisions layered onto Playwright evidence and run history</p></div></div><div class="header-actions">${providerSummary ? `<span class="muted" title="Decisions grouped by the engine that produced them">${escapeHtml(providerSummary)}</span>` : ''}<span class="muted">Generated ${escapeHtml(formatDate(report.generatedAt))}</span><button id="theme-toggle" class="icon-button theme-toggle" aria-label="Toggle colour theme">${THEME_ICONS}</button></div></header>
+    <header class="topbar"><div class="brand"><span class="brand-mark">${SPARKLE_ICON}</span><div><h1>System One Decision Lab</h1><p>Fast model decisions layered onto Playwright evidence and run history</p></div></div><div class="header-actions">${providerSummary ? `<span class="provider-summary" aria-label="Persisted decisions by engine">${providerSummary}</span>` : ''}<span class="muted">Generated ${escapeHtml(formatDate(report.generatedAt))}</span><button id="theme-toggle" class="icon-button theme-toggle" aria-label="Toggle colour theme">${THEME_ICONS}</button></div></header>
     <nav class="tabs" role="tablist"><button class="tab active" data-tab="current" role="tab" aria-selected="true">Current</button><button class="tab" data-tab="historical" role="tab" aria-selected="false" tabindex="-1">Historical</button></nav>
     ${renderCurrent(report)}${renderHistorical(report)}
     <footer class="footer"><span>Database snapshot · ${report.summary.runCount} runs · ${report.summary.executionCount} executions · ${report.summary.decisionCount} ${escapeHtml(activeDecisionLabel)} decisions</span><span>Keyboard: 1 current · 2 historical · / search</span></footer>
